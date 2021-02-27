@@ -1,62 +1,39 @@
-import { ChallengesContext } from "../contexts/ChallengesContext";
-import { useState, useEffect, useContext } from "react";
-import styles from "../styles/components/Countdown.module.css";
+import { useContext } from 'react';
+import { CountdownContext } from '../contexts/CountdownContext';
+import styles from '../styles/components/Countdown.module.css';
 
-let countdownTimeout: NodeJS.Timeout;
+import { FiPlayCircle, FiXCircle } from 'react-icons/fi';
 
 export function Countdown() {
-  const { startNewChallenge } = useContext(ChallengesContext);
+  const {
+    minutes,
+    seconds,
+    hasFinished,
+    isActive,
+    startCountdown,
+    resetCountdown,
+  } = useContext(CountdownContext);
 
-
-  const [time, setTime] = useState(0.1 * 60);
-  const [isActive, setIsActive] = useState(false);
-  const [hasFinished, setHasFinished] = useState(false);
-
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-
-  const [minuteleft, minuterigth] = String(minutes).padStart(2, "0").split("");
-  const [secondleft, secondrigth] = String(seconds).padStart(2, "0").split("");
-
-  function startCountdown() {
-    setIsActive(true);
-  }
-
-  function resetCountdown() {
-    clearTimeout(countdownTimeout);
-    setIsActive(false);
-    setTime(0.1 * 60);
-  }
-
-  useEffect(() => {
-    if (isActive && time > 0) {
-      countdownTimeout = setTimeout(() => {
-        setTime(time - 1);
-      }, 1000);
-    } else if (isActive && time === 0) {
-      setHasFinished(true);
-      setIsActive(true);
-      startNewChallenge()
-    }
-  }, [isActive, time]);
+  const [minutLeft, minutRight] = String(minutes).padStart(2, '0').split('');
+  const [secondLeft, secondRight] = String(seconds).padStart(2, '0').split('');
 
   return (
     <div>
-      <div className={styles.countdownContainer}>
+      <div className={styles.CountdownContainer}>
         <div>
-          <span>{minuteleft}</span>
-          <span>{minuterigth}</span>
+          <span>{minutLeft}</span>
+          <span>{minutRight}</span>
         </div>
         <span>:</span>
         <div>
-          <span>{secondleft}</span>
-          <span>{secondrigth}</span>
+          <span>{secondLeft}</span>
+          <span>{secondRight}</span>
         </div>
       </div>
 
       {hasFinished ? (
         <button disabled className={styles.countdownButton}>
-          Ciclo encerrado
+          Finalizado!
         </button>
       ) : (
         <>
@@ -66,7 +43,8 @@ export function Countdown() {
               className={`${styles.countdownButton} ${styles.countdownButtonActive}`}
               onClick={resetCountdown}
             >
-              Abandonar ciclo
+              Abandonar
+              <FiXCircle size={22} />
             </button>
           ) : (
             <button
@@ -74,7 +52,8 @@ export function Countdown() {
               className={styles.countdownButton}
               onClick={startCountdown}
             >
-              Inciar um ciclo
+              Começar a contagem
+              <FiPlayCircle size={22} />
             </button>
           )}
         </>
